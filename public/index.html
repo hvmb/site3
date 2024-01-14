@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/fontawsomepro.js"></script>
+    <script src="js/script.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/particles.css">
+    <link rel="icon" type="x-icon" href="favicon.ico">
+    <title>cats</title>
+</head>
+<body>
+
+<div class="page-bg"></div>
+<div class="animation-wrapper">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+</div>
+<div class="main">
+    <div class="before">
+        <h1>click to enter</h1>
+    </div>
+    <div class="after">
+        <div class="top">
+            <h1>Qutie<span class="small"></span></h1>
+            <div class="socials">
+                <a href="https://discord.com/users/1111684150097883156"><i class="fa-brands fa-discord"></i></a>
+                <a href="https://t.me/astridscutie"><i class="fa-brands fa-telegram"></i></a>
+            </div>
+        </div>
+        <div class="divider">
+            <i class="fa-light fa-plus"></i>
+            <span class="line"></span>
+            <i class="fa-light fa-plus"></i>
+        </div>
+        <p style="text-align:center"> professional broke person | <a href="https://kittyvpn.sellpass.io" style="text-decoration: none; color: #ffffff;">kitty vpn</a> | dm on discord/tele to buy proxy</p>
+        <div id="chart" style="width: 23.5vw; height: 35vh; margin: 2vh auto 5vh -5%;"></div>
+    </div>
+</div>
+
+<script>
+    const chart = echarts.init(document.getElementById('chart'));
+
+    const option = {
+        title: {
+            text: ' ',
+            textStyle: {
+                color: '#ffffff', // Text color
+            },
+        },
+        legend: {
+            data: ['RPS'],
+            textStyle: {
+                color: '#ffffff', // Text color
+            },
+        },
+        xAxis: {
+            type: 'category',
+            data: [],
+            axisLine: {
+                lineStyle: {
+                    color: '#ffffff', // Axis line color
+                },
+            },
+            axisLabel: {
+                show: false,
+                color: '#ffffff', // Axis label color
+            },
+            boundaryGap: false, // Remove white space at both ends
+            splitLine: {
+                show: false, // Hide grid lines
+            },
+        },
+        yAxis: {
+            type: 'value',
+            axisLine: {
+                lineStyle: {
+                    show: false,
+                    color: '#ffffff', // Axis line color
+                },
+            },
+            axisLabel: {
+                color: '#ffffff', // Axis label color
+            },
+            splitLine: {
+                show: false, // Hide grid lines
+            },
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+            },
+        },
+        series: [{
+            name: 'Requests per Second',
+            type: 'line',
+            smooth: true,
+            data: [],
+            maxDataPoints: 30,
+            itemStyle: {
+                color: '#91cc75', // Line color
+                width: 2, // Line width
+            },
+        }],
+    };
+
+    chart.setOption(option);
+
+    // Fetch data from the server every second
+    setInterval(() => {
+        fetch('/api/totalReqCount')
+            .then(response => response.json())
+            .then(data => {
+                const now = new Date();
+                const time = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+
+                option.xAxis.data.push(time);
+                option.series[0].data.push(data.totalReqCount);
+
+                // Remove the oldest data points if exceeding the limit
+                if (option.xAxis.data.length > option.series[0].maxDataPoints) {
+                    option.xAxis.data.shift();
+                    option.series[0].data.shift();
+                }
+
+                chart.setOption(option, true);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }, 1000);
+</script>
+
+</body>
+</html>
